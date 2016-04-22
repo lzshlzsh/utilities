@@ -32,14 +32,18 @@ public:
     /**
      * @brief
      */
-    TimeProfile () {
+    TimeProfile (const std::string &info): info_(info) {
         reset();
     }
+    /**
+     * @brief 
+     */
     ~TimeProfile() {
         double cst;
         cst = cost();
-        cout << "cost: " << cst 
-            << ",\tperf: " << static_cast<double>(MEM_SIZE) * TEST_ITERATION * 1e6 / cst / (1 << 30)
+        cout << info_ << ": cost " << cst 
+            << ",\tsize " << MEM_SIZE / 1024 / 1024 * TEST_ITERATION / 1024 << "G"
+            << ",\tperf " << static_cast<double>(MEM_SIZE) * TEST_ITERATION * 1e6 / cst / (1 << 30)
             << "G/s" << endl;
     }
     /**
@@ -64,6 +68,7 @@ public:
 protected:
 private:
     double start_;
+    std::string info_;
 };
 
 
@@ -73,7 +78,7 @@ private:
 static void read_perf(void *addr)
 {
     uint64_t t = 0;
-    TimeProfile profile;
+    TimeProfile profile(__FUNCTION__);
 
     __asm__ __volatile__ (
         "xorq %%rbx, %%rbx\n"
@@ -102,7 +107,7 @@ static void read_perf(void *addr)
 static void write_perf(void *addr)
 {
     uint64_t t = 0;
-    TimeProfile profile;
+    TimeProfile profile(__FUNCTION__);
 
     __asm__ __volatile__ (
         "xorq %%rbx, %%rbx\n"
